@@ -1,9 +1,11 @@
 "use client"
 
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Play, Sparkles } from "lucide-react"
 
 export function HeroSection() {
+  const router = useRouter()
   return (
     <section className="relative overflow-hidden py-20 md:py-32">
       {/* Background Effects */}
@@ -33,6 +35,7 @@ export function HeroSection() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Button
               size="lg"
+              onClick={() => router.push("/upload")}
               className="gradient-primary text-primary-foreground hover:opacity-90 transition-opacity px-8 py-6 text-lg animate-pulse-glow"
             >
               <Sparkles className="mr-2 h-5 w-5" />
