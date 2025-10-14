@@ -11,6 +11,10 @@ export const metadata: Metadata = {
   title: "VideoAI - Transform Long Videos into Viral Shorts",
   description: "AI-powered short-form video creation platform that automatically detects highlights from long videos",
   generator: "v0.app",
+  icons: {
+    icon: "/logo.svg",
+    apple: "/logo.svg",
+  },
 }
 
 export default function RootLayout({
