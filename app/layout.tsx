@@ -12,8 +12,8 @@ export const metadata: Metadata = {
   description: "AI-powered short-form video creation platform that automatically detects highlights from long videos",
   generator: "v0.app",
   icons: {
-    icon: "/logo.svg",
-    apple: "/logo.svg",
+    icon: "/logo.webp",
+    apple: "/logo.webp",
   },
 }
 
