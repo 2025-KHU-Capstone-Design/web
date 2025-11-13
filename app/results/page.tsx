@@ -19,79 +19,120 @@ import {
   Upload as UploadIcon
 } from "lucide-react"
 
-export default function ResultsPage() {
-  const router = useRouter()
-  const [activeFilter, setActiveFilter] = useState("all")
-
-  const highlights = [
+// JSON 데이터 구조 - 원본 동영상 정보와 생성된 클립 정보를 포함
+const videoResultData = {
+  original: {
+    title: "Sample Video",
+    filename: "sample_video.mp4",
+    duration: "10:30",
+    uploadDate: "2025-01-15",
+    fileSize: "125 MB",
+    resolution: "1920x1080",
+    fps: 30,
+    videoUrl: "https://video-ai-sample.s3.ap-northeast-2.amazonaws.com/1+Minute+Sample+Video.mp4", // S3 URL - 나중에 수정
+  },
+  analysis: {
+    processedDate: "2025-01-15",
+    totalHighlights: 4,
+    averageScore: 90,
+  },
+  highlights: [
     { time: "0:45", score: 95, type: "Action Peak", color: "bg-accent" },
     { time: "2:30", score: 88, type: "Emotional", color: "bg-primary" },
     { time: "4:15", score: 92, type: "Dialogue", color: "bg-secondary" },
     { time: "6:20", score: 85, type: "Visual", color: "bg-accent" },
-  ]
-
-  const clips = [
+  ],
+  generatedClips: [
     {
       id: 1,
       title: "Epic Action Sequence",
+      startTime: "0:38",
+      endTime: "0:53",
       duration: "0:15",
       score: 95,
       category: "action",
       platform: "TikTok",
       views: "2.4M",
       engagement: "12.5%",
+      videoUrl: "https://video-ai-sample.s3.ap-northeast-2.amazonaws.com/%E1%84%89%E1%85%B5%E1%86%B7%E1%84%90%E1%85%A5+%E1%84%89%E1%85%B5%E1%84%8B%E1%85%A7%E1%86%AB+%E1%84%8B%E1%85%A7%E1%86%BC%E1%84%89%E1%85%A1%E1%86%BC.mp4", // S3 URL - 나중에 수정
     },
     {
       id: 2,
       title: "Emotional Breakthrough",
+      startTime: "2:23",
+      endTime: "2:45",
       duration: "0:22",
       score: 88,
       category: "emotional",
       platform: "Instagram",
       views: "1.8M",
       engagement: "15.2%",
+      videoUrl: "https://video-ai-sample.s3.ap-northeast-2.amazonaws.com/PAREIDOLIA+-+1+Minute+Short+Film+_+Award+Winning.mp4", // S3 URL - 나중에 수정
     },
     {
       id: 3,
       title: "Key Dialogue Moment",
+      startTime: "4:07",
+      endTime: "4:25",
       duration: "0:18",
       score: 92,
       category: "dialogue",
       platform: "YouTube",
       views: "3.1M",
       engagement: "18.7%",
+      videoUrl: "https://video-ai-sample.s3.ap-northeast-2.amazonaws.com/videoplayback1.mp4", // S3 URL - 나중에 수정
     },
-    {
-      id: 4,
-      title: "Visual Spectacle",
-      duration: "0:12",
-      score: 89,
-      category: "visual",
-      platform: "TikTok",
-      views: "4.2M",
-      engagement: "22.1%",
-    },
-    {
-      id: 5,
-      title: "Comedy Gold",
-      duration: "0:25",
-      score: 94,
-      category: "comedy",
-      platform: "Instagram",
-      views: "5.6M",
-      engagement: "28.3%",
-    },
-    {
-      id: 6,
-      title: "Suspenseful Build",
-      duration: "0:20",
-      score: 87,
-      category: "suspense",
-      platform: "YouTube",
-      views: "2.9M",
-      engagement: "16.8%",
-    },
-  ]
+    // {
+    //   id: 4,
+    //   title: "Visual Spectacle",
+    //   startTime: "6:14",
+    //   endTime: "6:26",
+    //   duration: "0:12",
+    //   score: 89,
+    //   category: "visual",
+    //   platform: "TikTok",
+    //   views: "4.2M",
+    //   engagement: "22.1%",
+    //   thumbnailUrl: "https://s3.amazonaws.com/bucket-name/clips/thumbnails/clip_4_thumb.jpg", // S3 URL - 나중에 수정
+    //   videoUrl: "https://s3.amazonaws.com/bucket-name/clips/clip_4.mp4", // S3 URL - 나중에 수정
+    // },
+    // {
+    //   id: 5,
+    //   title: "Comedy Gold",
+    //   startTime: "7:30",
+    //   endTime: "7:55",
+    //   duration: "0:25",
+    //   score: 94,
+    //   category: "comedy",
+    //   platform: "Instagram",
+    //   views: "5.6M",
+    //   engagement: "28.3%",
+    //   thumbnailUrl: "https://s3.amazonaws.com/bucket-name/clips/thumbnails/clip_5_thumb.jpg", // S3 URL - 나중에 수정
+    //   videoUrl: "https://s3.amazonaws.com/bucket-name/clips/clip_5.mp4", // S3 URL - 나중에 수정
+    // },
+    // {
+    //   id: 6,
+    //   title: "Suspenseful Build",
+    //   startTime: "9:10",
+    //   endTime: "9:30",
+    //   duration: "0:20",
+    //   score: 87,
+    //   category: "suspense",
+    //   platform: "YouTube",
+    //   views: "2.9M",
+    //   engagement: "16.8%",
+    //   thumbnailUrl: "https://s3.amazonaws.com/bucket-name/clips/thumbnails/clip_6_thumb.jpg", // S3 URL - 나중에 수정
+    //   videoUrl: "https://s3.amazonaws.com/bucket-name/clips/clip_6.mp4", // S3 URL - 나중에 수정
+    // },
+  ],
+}
+
+export default function ResultsPage() {
+  const router = useRouter()
+  const [activeFilter, setActiveFilter] = useState("all")
+
+  // JSON 데이터에서 필요한 정보 추출
+  const { original, analysis, highlights, generatedClips } = videoResultData
 
   const filters = [
     { id: "all", label: "All Clips", icon: Filter },
@@ -100,14 +141,15 @@ export default function ResultsPage() {
     { id: "action", label: "Most Action", icon: Zap },
   ]
 
+  // JSON 데이터 기반 필터링
   const filteredClips =
     activeFilter === "all"
-      ? clips
+      ? generatedClips
       : activeFilter === "best"
-        ? clips.filter((clip) => clip.score >= 90)
+        ? generatedClips.filter((clip) => clip.score >= 90)
         : activeFilter === "longest"
-          ? clips.sort((a, b) => Number.parseInt(b.duration.split(":")[1]) - Number.parseInt(a.duration.split(":")[1]))
-          : clips.filter((clip) => clip.category === "action")
+          ? [...generatedClips].sort((a, b) => Number.parseInt(b.duration.split(":")[1]) - Number.parseInt(a.duration.split(":")[1]))
+          : generatedClips.filter((clip) => clip.category === "action")
 
   return (
     <div className="min-h-screen bg-background">
@@ -141,6 +183,56 @@ export default function ResultsPage() {
             We found the best moments in your video
           </p>
         </div>
+
+        {/* Original Video Info */}
+        <Card className="glassmorphism p-6 mb-8">
+          <div className="flex items-center gap-3 mb-4">
+            <Play className="h-6 w-6 text-primary" />
+            <h3 className="text-xl font-bold">Original Video</h3>
+          </div>
+
+          {/* Video Player */}
+          <div className="mb-6">
+            <div className="relative aspect-video bg-black rounded-lg overflow-hidden">
+              <video
+                controls
+                className="w-full h-full"
+                preload="metadata"
+              >
+                <source src={original.videoUrl} type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="p-3 bg-muted/20 rounded-lg">
+              <p className="text-xs text-muted-foreground mb-1">Filename</p>
+              <p className="text-sm font-medium truncate">{original.filename}</p>
+            </div>
+            <div className="p-3 bg-muted/20 rounded-lg">
+              <p className="text-xs text-muted-foreground mb-1">Duration</p>
+              <p className="text-sm font-medium">{original.duration}</p>
+            </div>
+            <div className="p-3 bg-muted/20 rounded-lg">
+              <p className="text-xs text-muted-foreground mb-1">Resolution</p>
+              <p className="text-sm font-medium">{original.resolution}</p>
+            </div>
+            <div className="p-3 bg-muted/20 rounded-lg">
+              <p className="text-xs text-muted-foreground mb-1">File Size</p>
+              <p className="text-sm font-medium">{original.fileSize}</p>
+            </div>
+          </div>
+          <div className="mt-4 flex items-center gap-4 text-sm text-muted-foreground">
+            <span>Uploaded: {original.uploadDate}</span>
+            <span>•</span>
+            <span>Processed: {analysis.processedDate}</span>
+            <span>•</span>
+            <span>{analysis.totalHighlights} highlights found</span>
+            <span>•</span>
+            <span>Avg. Score: {analysis.averageScore}%</span>
+          </div>
+        </Card>
 
         {/* AI Analysis Dashboard */}
         <Card className="glassmorphism p-6 mb-12">
@@ -224,16 +316,22 @@ export default function ResultsPage() {
                 key={clip.id}
                 className="glassmorphism overflow-hidden group hover:scale-105 transition-all duration-300"
               >
-                {/* Thumbnail */}
-                <div className="relative aspect-[9/16] bg-gradient-to-br from-muted/50 to-muted/20">
+                {/* Video Player with Letterbox (9:16 ratio) */}
+                <div className="relative aspect-[9/16] bg-black">
+                  {/* Letterbox Video Container */}
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center group-hover:bg-primary/40 transition-colors group-hover:scale-110">
-                      <Play className="h-8 w-8 text-accent" />
-                    </div>
+                    <video
+                      controls
+                      className="w-full h-auto max-h-full object-contain"
+                      preload="metadata"
+                    >
+                      <source src={clip.videoUrl} type="video/mp4" />
+                      Your browser does not support the video tag.
+                    </video>
                   </div>
 
                   {/* Overlay Info */}
-                  <div className="absolute top-4 left-4 right-4 flex justify-between">
+                  <div className="absolute top-4 left-4 right-4 flex justify-between z-10 pointer-events-none">
                     <Badge className="bg-background/80 text-foreground">
                       <Clock className="h-3 w-3 mr-1" />
                       {clip.duration}
@@ -243,9 +341,9 @@ export default function ResultsPage() {
                     </Badge>
                   </div>
 
-                  <div className="absolute bottom-4 left-4 right-4">
+                  <div className="absolute bottom-4 left-4 right-4 z-10 pointer-events-none">
                     <Badge className="bg-background/80 text-foreground mb-2">{clip.platform}</Badge>
-                    <div className="flex justify-between text-xs text-background/80">
+                    <div className="flex justify-between text-xs text-white/90">
                       <span>{clip.views} views</span>
                       <span>{clip.engagement} engagement</span>
                     </div>
@@ -254,14 +352,23 @@ export default function ResultsPage() {
 
                 {/* Content */}
                 <div className="p-6">
-                  <h3 className="font-bold text-lg mb-4 text-balance">{clip.title}</h3>
+                  <h3 className="font-bold text-lg mb-2 text-balance">{clip.title}</h3>
+
+                  {/* Clip Time Range */}
+                  <div className="text-xs text-muted-foreground mb-4">
+                    From {clip.startTime} to {clip.endTime}
+                  </div>
 
                   <div className="flex gap-2 mb-4">
                     <Button size="sm" variant="outline" className="flex-1 bg-transparent">
                       <Play className="h-4 w-4 mr-2" />
                       Preview
                     </Button>
-                    <Button size="sm" variant="outline">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => router.push(`/results/edit/${clip.id}`)}
+                    >
                       <Edit className="h-4 w-4" />
                     </Button>
                   </div>
